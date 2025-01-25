@@ -46,7 +46,27 @@ where
         if n > exp_max {
             x *= f_exp_max;
             n -= exp_max;
-            if n > exp_max {
+
+            if F::BITS < 32 && n > exp_max {
+                x *= f_exp_max;
+                n -= exp_max;
+
+                if n > exp_max {
+                    x *= f_exp_max;
+                    n -= exp_max;
+                    if n > exp_max {
+                        x *= f_exp_max;
+                        n -= exp_max;
+                        if n > exp_max {
+                            x *= f_exp_max;
+                            n -= exp_max;
+                            if n > exp_max {
+                                n = exp_max;
+                            }
+                        }
+                    }
+                }
+            } else if n > exp_max {
                 n = exp_max;
             }
         }
@@ -59,7 +79,46 @@ where
         if n < exp_min {
             x *= mul;
             n += add;
-            if n < exp_min {
+            if F::BITS < 32 {
+                if n < exp_min {
+                    x *= mul;
+                    n += add;
+
+                    if n < exp_min {
+                        x *= mul;
+                        n += add;
+
+                        if n < exp_min {
+                            x *= mul;
+                            n += add;
+
+                            if n < exp_min {
+                                x *= mul;
+                                n += add;
+
+                                if n < exp_min {
+                                    x *= mul;
+                                    n += add;
+
+                                    if n < exp_min {
+                                        x *= mul;
+                                        n += add;
+
+                                        if n < exp_min {
+                                            x *= mul;
+                                            n += add;
+
+                                            if n < exp_min {
+                                                n = exp_min;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if n < exp_min {
                 n = exp_min;
             }
         }
@@ -112,6 +171,12 @@ mod tests {
     }
 
     #[test]
+    #[cfg(f16_enabled)]
+    fn spec_test_f16() {
+        spec_test::<f16>();
+    }
+
+    #[test]
     fn spec_test_f32() {
         spec_test::<f32>();
     }
@@ -119,5 +184,11 @@ mod tests {
     #[test]
     fn spec_test_f64() {
         spec_test::<f64>();
+    }
+
+    #[test]
+    #[cfg(f128_enabled)]
+    fn spec_test_f128() {
+        spec_test::<f128>();
     }
 }
